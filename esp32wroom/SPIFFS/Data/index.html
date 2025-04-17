@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ 智能停车号码牌监控系统 Pro ✨</title>
+    <!-- Google Font for better typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome Icons for rich iconography -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Chart.js for data visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- tsParticles for background effects -->
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.10.1/tsparticles.bundle.min.js"></script>
+
+    <style>
+        /* --- CSS Variables for Theming --- */
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --text-color: #333;
+            --bg-color: #f0f8ff;
+            --bg-gradient: linear-gradient(135deg, #6dd5ed 0%, #2193b0 100%);
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --card-bg-dark: rgba(44, 62, 80, 0.9);
+            --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            --border-radius: 20px;
+            --transition-speed: 0.4s;
+        }
+
+        /* Dark Theme Variables */
+        [data-theme="dark"] {
+            --text-color: #ecf0f1;
+            --bg-color: #1f2c38;
+            --bg-gradient: linear-gradient(135deg, #2c3e50 0%, #1a1a2e 100%);
+            --card-bg: rgba(44, 62, 80, 0.9);
+            --dark-color: #ecf0f1;
+        }
+
+        /* --- Global Reset and Styles --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            line-height: 1.7;
+            overflow-x: hidden;
+            transition: background var(--transition-speed) ease, color var(--transition-speed) ease;
+        }
+
+        /* --- Particle Background Container --- */
+        #tsparticles {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            background: var(--bg-gradient);
+            transition: background var(--transition-speed) ease;
+        }
+
+        /* --- Main Container with Glassmorphism --- */
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            background: var(--card-bg);
+            padding: 30px 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(12px) saturate(150%);
+            -webkit-backdrop-filter: blur(12px) saturate(150%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background var(--transition-speed) ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        /* --- Headings with Underline Animation --- */
+        h1,
+        h2 {
+            color: var(--dark-color);
+            margin-top: 35px;
+            margin-bottom: 25px;
+            font-weight: 600;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        h1::after,
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 2px;
+            animation: slideInLine 1s ease-out forwards;
+        }
+
+        @keyframes slideInLine {
+            from {
+                width: 0;
+                opacity: 0;
+            }
+
+            to {
+                width: 80px;
+                opacity: 1;
+            }
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.8em;
+            font-weight: 700;
+            color: transparent;
+            background: linear-gradient(90deg, #2c3e50, #34495e);
+            background-clip: text;
+            -webkit-background-clip: text;
+            margin-top: 15px;
+            padding-bottom: 20px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h1::after {
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+        }
+
+        /* --- SOS Alert with Animation --- */
+        #sos-alert {
+            display: none;
+            background: linear-gradient(135deg, #ff6b6b, var(--danger-color));
+            color: white;
+            padding: 18px 25px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.2em;
+            border-radius: calc(var(--border-radius) / 1.5);
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4);
+            animation: pulse-danger 1.5s infinite;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #sos-alert i {
+            margin-right: 10px;
+            animation: spin-alert 2s linear infinite;
+        }
+
+        @keyframes pulse-danger {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4);
+            }
+
+            50% {
+                transform: scale(1.03);
+                box-shadow: 0 8px 30px rgba(231, 76, 60, 0.6);
+            }
+
+            100% {
+                transform: scale(1);
+                box-shadow: 0 5px 20px rgba(231, 76, 60, 0.4);
+            }
+        }
+
+        @keyframes spin-alert {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* --- Info Box with Hover Effects --- */
+        .info-box {
+            background: rgba(236, 240, 241, 0.8);
+            border-radius: calc(var(--border-radius) / 1.5);
+            padding: 25px;
+            margin-bottom: 30px;
+            transition: all var(--transition-speed) ease;
+            border-left: 7px solid;
+            border-image: linear-gradient(to bottom, var(--primary-color), var(--secondary-color)) 1;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .info-box:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transform: translateY(-4px) scale(1.01);
+            border-image: linear-gradient(to bottom, var(--secondary-color), var(--warning-color)) 1;
+        }
+
+        .info-box h2 {
+            margin-top: 0;
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+
+        .info-box h2 i {
+            margin-right: 10px;
+            color: var(--primary-color);
+            transition: transform var(--transition-speed) ease;
+        }
+
+        .info-box:hover h2 i {
+            transform: rotate(-10deg) scale(1.1);
+        }
+
+        .info-box p {
+            margin: 10px 0;
+            font-size: 1.05em;
+        }
+
+        .info-box p strong {
+            color: var(--dark-color);
+            min-width: 100px;
+            display: inline-block;
+            font-weight: 500;
+        }
+
+        .info-box span {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        #risk-level {
+            color: var(--warning-color);
+            font-weight: 600;
+        }
+
+        #model-accuracy {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        /* --- Chart Container with Subtle Shadows --- */
+        .chart-container {
+            position: relative;
+            height: 380px;
+            margin-bottom: 35px;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.05);
+            transition: background var(--transition-speed) ease;
+        }
+
+        [data-theme="dark"] .chart-container {
+            background: rgba(44, 62, 80, 0.6);
+        }
+
+        /* --- Status Grid with Gradient Cards --- */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 30px;
+        }
+
+        .status-item {
+            color: white;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            transition: all var(--transition-speed) ease;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-item:nth-child(1) {
+            background: linear-gradient(145deg, #5dade2, #2980b9);
+        }
+
+        .status-item:nth-child(2) {
+            background: linear-gradient(145deg, #f1c40f, #f39c12);
+        }
+
+        .status-item:nth-child(3) {
+            background: linear-gradient(145deg, #58d68d, #229954);
+        }
+
+        .status-item::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0) 100%);
+            transition: left var(--transition-speed) ease-out;
+            transform: skewX(-25deg);
+        }
+
+        .status-item:hover::before {
+            left: 100%;
+        }
+
+        .status-item:hover {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .status-item h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-weight: 500;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .status-item h3 i {
+            opacity: 0.8;
+        }
+
+        .status-value {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin: 10px 0;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+            animation: fadeInValue 0.8s ease-in-out;
+        }
+
+        @keyframes fadeInValue {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .status-item p {
+            margin-bottom: 0;
+            font-size: 0.95em;
+            opacity: 0.9;
+        }
+
+        /* --- Theme Toggle Button --- */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1.2em;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform var(--transition-speed) ease, background var(--transition-speed) ease;
+            z-index: 10;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            background: var(--secondary-color);
+        }
+
+        /* --- Modal for Detailed Info --- */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: modalFadeIn 0.3s ease-out;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-close {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            float: right;
+            transition: transform var(--transition-speed) ease;
+        }
+
+        .modal-close:hover {
+            transform: scale(1.1);
+        }
+
+        /* --- Notification Bar --- */
+        .notification-bar {
+            background: rgba(46, 204, 113, 0.9);
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 0.95em;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            display: none;
+            animation: fadeInNotification 0.5s ease-out;
+        }
+
+        @keyframes fadeInNotification {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- History Section --- */
+        .history-section {
+            margin-top: 40px;
+            padding: 30px;
+            background: rgba(236, 240, 241, 0.8);
+            border-radius: var(--border-radius);
+            transition: background var(--transition-speed) ease;
+        }
+
+        [data-theme="dark"] .history-section {
+            background: rgba(44, 62, 80, 0.8);
+        }
+
+        .history-item {
+            padding: 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background var(--transition-speed) ease;
+        }
+
+        .history-item:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-item span {
+            color: var(--primary-color);
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* --- Responsive Design --- */
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px;
+                padding: 20px;
+                border-radius: 15px;
+            }
+
+            h1 {
+                font-size: 2.2em;
+            }
+
+            h2 {
+                font-size: 1.6em;
+            }
+
+            .status-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .chart-container {
+                height: 320px;
+            }
+
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                font-size: 1em;
+                padding: 8px 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                font-size: 15px;
+            }
+
+            .container {
+                padding: 15px;
+                border-radius: 10px;
+                margin: 10px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            h2 {
+                font-size: 1.3em;
+            }
+
+            h1::after,
+            h2::after {
+                width: 60px;
+                height: 3px;
+            }
+
+            h1::after {
+                width: 100px;
+            }
+
+            .status-value {
+                font-size: 2em;
+            }
+
+            .info-box {
+                padding: 20px;
+            }
+
+            #sos-alert {
+                font-size: 1em;
+                padding: 15px 20px;
+            }
+
+            .history-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Particle Background -->
+    <div id="tsparticles"></div>
+
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-adjust"></i>
+    </button>
+
+    <div class="container">
+        <h1><i class="fas fa-shield-alt"></i> 智能停车号码牌监控系统 <i class="fas fa-satellite-dish"></i></h1>
+
+        <!-- Notification Bar for System Updates -->
+        <div class="notification-bar" id="notificationBar">
+            <i class="fas fa-info-circle"></i> 系统状态正常，数据实时更新中...
+        </div>
+
+        <!-- SOS Alert Section -->
+        <div id="sos-alert">
+            <i class="fas fa-exclamation-triangle"></i> 紧急！SOS求救信号已触发！请立即核实处理！
+        </div>
+
+        <!-- Vehicle Information Display -->
+        <div class="info-box">
+            <h2><i class="fas fa-car-side"></i> 车辆信息</h2>
+            <p><strong><i class="fas fa-id-card-clip fa-fw"></i> 车牌号码:</strong> <span id="plate-number">湘A-----</span>
+            </p>
+            <p><strong><i class="fas fa-map-marker-alt fa-fw"></i> 当前位置:</strong> <span id="location">模拟位置...</span></p>
+            <p><strong><i class="fas fa-compass fa-fw"></i> GPS坐标:</strong> <span id="gps-coords">--.--° E, --.--°
+                    N</span></p>
+        </div>
+
+        <!-- Prediction Chart for Risk Analysis -->
+        <h2><i class="fas fa-chart-line"></i> 灾害预测模型 (LSTM)</h2>
+        <div class="chart-container">
+            <canvas id="prediction-chart"></canvas>
+        </div>
+        <div class="info-box">
+            <p><strong><i class="fas fa-bullseye fa-fw"></i> 模型准确率:</strong> <span id="model-accuracy">--.-%</span></p>
+            <p><strong><i class="fas fa-clock fa-fw"></i> 预测时间范围:</strong> 未来24小时</p>
+            <p><strong><i class="fas fa-tachometer-alt fa-fw"></i> 当前风险评估:</strong> <span id="risk-level">计算中...</span>
+            </p>
+        </div>
+
+        <!-- System Status Overview -->
+        <h2><i class="fas fa-cogs"></i> 系统状态概览</h2>
+        <div class="status-grid">
+            <div class="status-item">
+                <h3><i class="fas fa-solar-panel"></i> 太阳能充电系统</h3>
+                <div class="status-value" id="battery-level">--%</div>
+                <p><i class="fas fa-bolt"></i> 充电效率: <span id="charge-efficiency">--%</span></p>
+            </div>
+            <div class="status-item">
+                <h3><i class="fas fa-smog"></i> 环境监测</h3>
+                <div class="status-value" id="smoke-level">--.--% VOL</div>
+                <p><i class="fas fa-fire-flame-curved"></i> 火焰探测: <span id="flame-detection">--</span></p>
+            </div>
+            <div class="status-item">
+                <h3><i class="fas fa-heartbeat"></i> 生命体征检测</h3>
+                <div class="status-value" id="heart-rate">-- BPM</div>
+                <p><i class="fas fa-lungs"></i> 呼吸率: <span id="respiration-rate">-- 次/分</span></p>
+            </div>
+        </div>
+
+        <!-- History Data Section -->
+        <div class="history-section">
+            <h2><i class="fas fa-history"></i> 历史记录</h2>
+            <div id="history-list">
+                <div class="history-item">
+                    <p>2023-10-01 14:30:45 - 风险等级: 中等</p>
+                    <span onclick="showHistoryDetail('2023-10-01')">查看详情</span>
+                </div>
+                <div class="history-item">
+                    <p>2023-10-02 09:15:22 - 风险等级: 低</p>
+                    <span onclick="showHistoryDetail('2023-10-02')">查看详情</span>
+                </div>
+                <div class="history-item">
+                    <p>2023-10-03 18:45:10 - 风险等级: 高</p>
+                    <span onclick="showHistoryDetail('2023-10-03')">查看详情</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for History Details -->
+    <div class="modal" id="historyModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('historyModal')"><i class="fas fa-times"></i></button>
+            <h2><i class="fas fa-info-circle"></i> 历史记录详情</h2>
+            <div id="history-detail-content">
+                <p>日期: <span id="detail-date">--</span></p>
+                <p>风险等级: <span id="detail-risk">--</span></p>
+                <p>详细数据: <span id="detail-data">--</span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let predictionChart;
+        let sosActive = false;
+        const CHART_POINTS = 24;
+        let currentTheme = 'light';
+
+        // --- tsParticles Configuration ---
+        async function loadParticles(options) {
+            await tsParticles.load("tsparticles", options);
+        }
+
+        const particlesOptions = {
+            fpsLimit: 60,
+            interactivity: {
+                events: {
+                    onHover: { enable: true, mode: "repulse" },
+                    resize: true,
+                },
+                modes: {
+                    repulse: { distance: 80, duration: 0.4 },
+                },
+            },
+            particles: {
+                color: { value: "#ffffff" },
+                links: {
+                    color: "#ffffff",
+                    distance: 150,
+                    enable: true,
+                    opacity: 0.3,
+                    width: 1,
+                },
+                collisions: { enable: false },
+                move: {
+                    direction: "none",
+                    enable: true,
+                    outModes: { default: "bounce" },
+                    random: false,
+                    speed: 1.5,
+                    straight: false,
+                },
+                number: { density: { enable: true, area: 800 }, value: 60 },
+                opacity: { value: 0.4, anim: { enable: true, speed: 0.5, opacity_min: 0.1 } },
+                shape: { type: "circle" },
+                size: { value: { min: 1, max: 4 } },
+            },
+            detectRetina: true,
+        };
+
+        // --- Chart.js Initialization for Risk Prediction ---
+        function initChart() {
+            const ctx = document.getElementById('prediction-chart').getContext('2d');
+            const initialData = generateSmoothData(CHART_POINTS, 30, 10);
+
+            predictionChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({ length: CHART_POINTS }, (_, i) => `${i}h`),
+                    datasets: [{
+                        label: '模拟灾害风险指数',
+                        data: initialData,
+                        borderColor: 'rgb(231, 76, 60)',
+                        backgroundColor: 'rgba(231, 76, 60, 0.3)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 4,
+                        pointBackgroundColor: 'rgb(231, 76, 60)',
+                        pointBorderColor: '#fff',
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(231, 76, 60)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20,
+                                color: '#555',
+                                font: { weight: '500' }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.08)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 0,
+                                autoSkip: true,
+                                maxTicksLimit: 12,
+                                color: '#555',
+                                font: { weight: '500' }
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    animation: { duration: 600, easing: 'easeInOutQuart' },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                color: '#333',
+                                font: { size: 14, weight: '500' },
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(44, 62, 80, 0.9)',
+                            titleFont: { weight: 'bold' },
+                            bodyFont: { size: 13 },
+                            cornerRadius: 8,
+                            padding: 10,
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- Data Simulation for Chart ---
+        function generateSmoothData(count, startValue, volatility) {
+            const data = [];
+            let previousValue = startValue;
+            for (let i = 0; i < count; i++) {
+                let change = (Math.random() - 0.48) * volatility;
+                let newValue = previousValue + change;
+                newValue = Math.max(5, Math.min(98, newValue));
+                data.push(parseFloat(newValue.toFixed(1)));
+                previousValue = newValue;
+            }
+            return data;
+        }
+
+        function updateChart() {
+            if (!predictionChart) return;
+            const currentData = predictionChart.data.datasets[0].data;
+            const newData = [];
+            let lastValue = currentData[currentData.length - 1] || 30;
+
+            // Shift data left
+            for (let i = 1; i < CHART_POINTS; i++) {
+                newData.push(currentData[i]);
+            }
+
+            // Add new data point at the end
+            let change = (Math.random() - 0.45) * 8;
+            if (Math.random() < 0.05) { // Occasional larger jump
+                change = (Math.random() - 0.3) * 25;
+            }
+            let newValue = lastValue + change;
+            newValue = Math.max(5, Math.min(98, newValue));
+            newData.push(parseFloat(newValue.toFixed(1)));
+
+            predictionChart.data.datasets[0].data = newData;
+            // Smooth update without full animation reset
+            predictionChart.update('quiet'); // 'quiet' prevents animation hooks firing, smoother for real-time
+        }
+
+        // --- Theme Switching Logic ---
+        function toggleTheme() {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('theme', currentTheme);
+            // Adjust chart colors if necessary
+            if (predictionChart) {
+                predictionChart.options.scales.x.ticks.color = currentTheme === 'dark' ? '#ecf0f1' : '#555';
+                predictionChart.options.scales.y.ticks.color = currentTheme === 'dark' ? '#ecf0f1' : '#555';
+                predictionChart.options.plugins.legend.labels.color = currentTheme === 'dark' ? '#ecf0f1' : '#333';
+                predictionChart.update();
+            }
+        }
+
+        // --- Modal Handling for History Details ---
+        function showHistoryDetail(date) {
+            document.getElementById('detail-date').textContent = date;
+            document.getElementById('detail-risk').textContent = '中等（模拟数据）';
+            document.getElementById('detail-data').textContent = '详细模拟数据将在未来版本中提供...';
+            document.getElementById('historyModal').style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // --- Notification Handling for System Updates ---
+        function showNotification(message, duration = 3000) {
+            const notificationBar = document.getElementById('notificationBar');
+            notificationBar.textContent = message;
+            notificationBar.style.display = 'block';
+            setTimeout(() => {
+                notificationBar.style.display = 'none';
+            }, duration);
+        }
+
+        // --- SOS Status Check (Kept as Fetch-based) ---
+        async function checkSOSStatus() {
+            try {
+                const response = await fetch('/get-sos-status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ update: false }) // Only get status
+                });
+                if (!response.ok) {
+                    console.error('HTTP 请求失败:', response.status);
+                    return false; // Exit if fetch fails
+                }
+                const data = await response.json();
+
+                // Update only if state changes
+                if (sosActive !== data.sosActive) {
+                    sosActive = data.sosActive;
+                    console.log('SOS状态更新 (模拟):', sosActive ? '激活' : '未激活');
+                    updateSOSDisplay();
+                }
+                return true; // Indicate success
+            } catch (error) {
+                console.error('获取SOS状态出错:', error.message);
+                return false; // Indicate failure
+            }
+        }
+
+        // --- SOS Display Logic (Retained for Control) ---
+        function updateSOSDisplay() {
+            const sosAlert = document.getElementById('sos-alert');
+            if (sosActive) {
+                sosAlert.style.display = 'block';
+            } else {
+                sosAlert.style.display = 'none';
+            }
+        }
+
+        // --- System Status Updates with Random Data Simulation ---
+        function updateSystemStatus() {
+            // Static info (could be dynamic if needed)
+            document.getElementById('plate-number').textContent = '湘A66666';
+            document.getElementById('location').textContent = '长沙航天学校·智能制造中心';
+            let lon = 113.1465 + (Math.random() - 0.5) * 0.002;
+            let lat = 27.8328 + (Math.random() - 0.5) * 0.002;
+            document.getElementById('gps-coords').textContent = `${lon.toFixed(5)}° E, ${lat.toFixed(5)}° N`;
+            document.getElementById('model-accuracy').textContent = (93.5 + Math.random() * 2.5).toFixed(1) + '%';
+            // Additional status updates can be added here for more detailed simulation
+            // Battery level simulation logic
+            let batteryLevelEl = document.getElementById('battery-level');
+            let currentBattery = parseInt(batteryLevelEl.textContent.replace('%', '')) || 75;
+            let batteryChange = Math.random() > 0.55 ? 1 : (Math.random() > 0.2 ? 0 : -1);
+            currentBattery = Math.min(100, Math.max(15, currentBattery + batteryChange));
+            batteryLevelEl.textContent = currentBattery + '%';
+            document.getElementById('charge-efficiency').textContent = Math.floor(18 + Math.random() * 12) + '%';
+            // Environment data simulation
+            let smokeLevel = Math.random() < 0.05 ? Math.random() * 0.5 : Math.random() * 0.06;
+            document.getElementById('smoke-level').textContent = smokeLevel.toFixed(2) + '% VOL';
+            let flameDetected = Math.random() < 0.02 ? '检测到' : '未检测到';
+            const flameEl = document.getElementById('flame-detection');
+            flameEl.textContent = flameDetected;
+            flameEl.style.color = flameDetected === '检测到' ? 'var(--danger-color)' : 'inherit';
+            flameEl.style.fontWeight = flameDetected === '检测到' ? 'bold' : 'normal';
+            // Heart rate and respiration rate simulation logic
+            let heartRateEl = document.getElementById('heart-rate');
+            let currentHeartRate = parseInt(heartRateEl.textContent.replace(' BPM', '')) || 72;
+            currentHeartRate += Math.floor((Math.random() - 0.5) * 4);
+            currentHeartRate = Math.max(55, Math.min(110, currentHeartRate));
+            heartRateEl.textContent = currentHeartRate + ' BPM';
+            let respRateEl = document.getElementById('respiration-rate');
+            let currentRespRate = parseInt(respRateEl.textContent.replace(' 次/分', '')) || 16;
+            currentRespRate += Math.floor((Math.random() - 0.48) * 2);
+            currentRespRate = Math.max(11, Math.min(22, currentRespRate));
+            respRateEl.textContent = currentRespRate + ' 次/分';
+            // Risk calculation based on chart data
+            const maxRisk = predictionChart ? Math.max(...predictionChart.data.datasets[0].data) : 0;
+            const riskLevelEl = document.getElementById('risk-level');
+            let riskText = '低';
+            let riskColor = 'var(--secondary-color)';
+            if (maxRisk > 75) {
+                riskText = '高';
+                riskColor = 'var(--danger-color)';
+            } else if (maxRisk > 45) {
+                riskText = '中等';
+                riskColor = 'var(--warning-color)';
+            }
+            riskLevelEl.textContent = riskText;
+            riskLevelEl.style.color = riskColor;
+        }
+
+        // --- Combined Update Function ---
+        function updateAll() {
+            updateSystemStatus(); // Update text values
+            updateChart();        // Update the chart data
+            // SOS status is handled by its own interval (checkSOSStatus)
+        }
+
+        // --- Initialization and Event Listeners ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load particle background animation effects
+            loadParticles(particlesOptions);
+            // Initialize the risk prediction chart
+            initChart();
+            // Perform initial data population
+            updateAll();
+            // Initial SOS check
+            checkSOSStatus();
+            // Setup theme based on user preference or default to light
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            currentTheme = savedTheme;
+            // Add event listener for theme toggle button
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+            // Periodically show notifications for demonstration
+            setTimeout(() => showNotification("系统已更新至最新版本！"), 5000);
+            // Set interval for periodic data updates
+            setInterval(updateAll, 3500);
+            // Set interval for SOS status check
+            setInterval(checkSOSStatus, 1000);
+            // Event listener to close modal by clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal')) {
+                    closeModal(e.target.id);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
